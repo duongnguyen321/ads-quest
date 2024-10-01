@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+    touch-action: none;
+}
+
+body > div[data-overlay-container] {
+    @apply w-full h-full max-w-screen-md min-h-screen mx-auto px-2;
+}
+
+img {
+    user-drag: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+tc-root > div, tc-root > div > button, tc-root > button {
+    min-width: 100% !important;
+    min-height: 64px !important;
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+}

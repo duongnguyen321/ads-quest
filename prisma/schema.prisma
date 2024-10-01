@@ -1,0 +1,132 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["tracing"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URL")
+}
+
+model User {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  username      String  @unique
+  telegramId    String  @unique @map("telegram_id")
+  isPremium     Boolean @default(false) @map("is_premium")
+  points        Float   @default(0) // In-game points
+  coinBalance   Float   @default(0) // COIN currency (virtual game coin)
+  walletAddress String? @map("wallet_address")
+  level         Int     @default(1) @map("user_level")
+  isUnlock      Boolean @default(false) @map("unlock")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  Level        Level?         @relation(fields: [level], references: [level])
+  GameSession  GameSession[]
+  Achievement  Achievement[]
+  Transaction  Transaction[]
+  Leaderboard  Leaderboard[]
+  Notification Notification[]
+
+  // Self-referential relationships for friends
+  Friends  Friend[] @relation("UserFriends")
+  FriendOf Friend[] @relation("FriendUsers")
+}
+
+model Level {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  level            Int       @unique @default(1)
+  description      String? // Description of the level
+  experienceNeeded Int?      @default(0) // Points needed to reach this level
+  createdAt        DateTime? @default(now()) @map("created_at")
+  updatedAt        DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  User        User[]
+  GameSession GameSession[]
+}
+
+model GameSession {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId String   @map("telegram_id")
+  score      Int
+  duration   Int // Duration of the game session in seconds
+  levelId    String?  @db.ObjectId // Track which level the player was on
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user  User   @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
+  level Level? @relation(fields: [levelId], references: [id])
+}
+
+model Achievement {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId  String   @map("telegram_id")
+  title       String
+  description String
+  points      Int      @default(0)
+  isCompleted Boolean  @default(false) // Status of the achievement
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
+}
+
+model Transaction {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId      String          @map("telegram_id")
+  amount          Float // Amount of COIN or game points
+  currencyType    CurrencyType // Enum to track type of currency (COIN or POINTS)
+  transactionType TransactionType // Enum for types of transactions (earn, spend, bonus)
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  user User @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
+}
+
+enum TransactionType {
+  EARN
+  SPEND
+  BONUS
+}
+
+enum CurrencyType {
+  COIN
+  POINTS
+}
+
+model Leaderboard {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  levelId    String?  @db.ObjectId // The level associated with this leaderboard
+  telegramId String   @map("telegram_id")
+  score      Float
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
+}
+
+model GameEvent {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime @default(now()) @map("created_at")
+}
+
+model Notification {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId String   @map("telegram_id")
+  message    String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
+}
+
+model Friend {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @map("user_id") @db.ObjectId
+  friendId  String   @map("friend_id") @db.ObjectId
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User @relation("UserFriends", fields: [userId], references: [id])
+  friend User @relation("FriendUsers", fields: [friendId], references: [id])
+}
