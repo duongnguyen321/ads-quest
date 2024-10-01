@@ -65,15 +65,13 @@ export default function useTonAction() {
   }, [handleStatusChange, tonConnectUi]);
 
 
-  const onSend = async ({
-                          message,
-                          itemId,
-                          amount,
-                        }: {
+  async function deposit({
+                           message,
+                           amount,
+                         }: {
     message: string;
-    itemId: string;
     amount: number;
-  }) => {
+  }) {
     if (!wallet) {
       toast.error('Please, Connect Ton Wallet!');
       throw new Error('Please, Connect Ton Wallet!');
@@ -90,7 +88,6 @@ export default function useTonAction() {
       addressSend: rawAddress, //địa chỉ người gửi
 
       payload: body.toBoc().toString('base64'),
-      item_id: itemId, // itemID
       amount: toNano(amount), // price of item
       userAddress: rawAddress, //địa chỉ người gửi
     };
@@ -120,11 +117,12 @@ export default function useTonAction() {
       console.error(error);
       throw error;
     }
-  };
+  }
 
   return {
     loading,
     wallet,
+    deposit,
     rawAddress,
     tonConnectUi,
   };
