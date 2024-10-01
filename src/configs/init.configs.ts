@@ -9,3 +9,5 @@ export const INIT_USER = {
 	telegramId: "123456789",
 	isPremium: false,
 }
+
+export const INIT_AMOUNT_UNLOCK = 1

@@ -18,21 +18,6 @@ export function removeAccents(str: string): string {
     .replace('Đ', 'D'); // Replace specific Vietnamese characters with their non-accented counterparts
 }
 
-/**
- * Parse JSON value to object.
- * @param {string} obj - the value to parse
- * @returns {object | null}  Object parsed or null
- */
-export function parseObj<T = object>(obj?: string | null): T | null {
-  if (!obj) return null;
-  let result: T | null;
-  try {
-    result = JSON.parse(obj);
-  } catch {
-    result = null;
-  }
-  return result;
-}
 
 /**
  * Formats a phone number by removing all non-numeric characters except the plus sign, and replaces the country code +84 with 0.

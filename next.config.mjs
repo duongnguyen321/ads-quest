@@ -21,6 +21,7 @@ const nextConfig = {
     SERVER_URL: process.env.SERVER_URL,
     TELEGRAM_URL: process.env.TELEGRAM_URL,
     DEV_USER_ID: process.env.DEV_USER_ID,
+    TON_ADDRESS:process.env.TON_ADDRESS
   },
   async headers() {
     return [

@@ -8,6 +8,7 @@ import useUserStore from '@/store/user.store';
 import { CardBody, CardFooter, CardHeader } from '@nextui-org/card';
 import { Button, Card } from '@nextui-org/react';
 import { TonConnectButton } from '@tonconnect/ui-react';
+import { useCopyToClipboard } from '@uidotdev/usehooks';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -16,6 +17,7 @@ export default function Home() {
   const { wallet, rawAddress } = useTonAction();
   const { user: userTelegram } = useTelegram();
   const { user, refetch } = useUserStore();
+  const [, copyText] = useCopyToClipboard();
 
   const lastRefetch = useRef(Date.now());
   const [canRefetch, setCanRefetch] = useState(false);
@@ -50,12 +52,30 @@ export default function Home() {
       </CardHeader>
       {user ? (
         <CardBody className="items-center justify-center gap-3">
-          <Card className={'relative'}>
-            <CardHeader>
+          <Card className={'relative flex items-center justify-center gap-3'}>
+            <CardHeader className={'relative w-fit h-fit'}>
               {
                 wallet ?
                   <CardBody className={'!text-teal-800 dark:!text-teal-200 text-center'}>
-                    Your TON Address: {truncate(rawAddress)}
+                    <span>Your TON Address: </span>
+                    <strong className={'relative z-20'} onClick={async () => {
+                      await copyText(rawAddress);
+                      toast.info(
+                        <>
+                          <b>
+                            {
+                              truncate(rawAddress, {
+                                limit: 5,
+                              })
+                            }
+                          </b>
+                          has copied to your clipboard!
+                        </>);
+                    }}>
+                      {truncate(rawAddress, {
+                        limit: 5,
+                      })}
+                    </strong>
                   </CardBody>
                   : <Button color={'primary'} variant={'ghost'}>Connect TON wallet</Button>
               }

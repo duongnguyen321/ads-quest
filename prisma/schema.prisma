@@ -76,9 +76,9 @@ model Transaction {
   amount          Float // Amount of COIN or game points
   currencyType    CurrencyType // Enum to track type of currency (COIN or POINTS)
   transactionType TransactionType // Enum for types of transactions (earn, spend, bonus)
+  hash            String?
   createdAt       DateTime        @default(now()) @map("created_at")
-
-  user User @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
+  user            User            @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
 }
 
 enum TransactionType {

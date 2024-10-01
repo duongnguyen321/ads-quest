@@ -51,10 +51,12 @@ export default function Navbar() {
 
       <NavbarContent
         justify="center">
-        <NavbarItem>
-          <ThemeSwitch />
-        </NavbarItem>
         <NaviLinkUser user={user} />
+        <NavbarItem>
+          <Button isIconOnly>
+            <ThemeSwitch />
+          </Button>
+        </NavbarItem>
       </NavbarContent>
     </NextUINavbar>
   );
@@ -67,9 +69,11 @@ function NaviLinkUser({ user }: { user: User | null }) {
       <Button
         as={Link}
         href={'/deposit'}
-        isIconOnly
+        color={'success'}
+        variant={'shadow'}
       >
         <ReceiveDollars />
+        <span>Deposit</span>
       </Button>
     </NavbarItem>);
   }
@@ -77,21 +81,26 @@ function NaviLinkUser({ user }: { user: User | null }) {
     <>
       <NavbarItem>
         <Button
-          isDisabled={!user || !user.isUnlock}
           as={Link}
           href={'/missions'}
-          isIconOnly
+          color={'warning'}
+          variant={'shadow'}
+          isDisabled={!user || !user.isUnlock}
         >
           <MoneySquare />
+          <span>Mission</span>
         </Button>
       </NavbarItem>
       <NavbarItem>
         <Button
           as={Link}
           href={'/revert'}
-          isIconOnly
-          isDisabled={!user || !user.isUnlock || user?.coinBalance < requireTONCashout || user.level < requireLevelRevert}>
+          color={'primary'}
+          variant={'shadow'}
+          isDisabled={!user || !user.isUnlock || user?.coinBalance < requireTONCashout || user.level < requireLevelRevert}
+        >
           <CoinsSwap />
+          <span>Revert</span>
         </Button>
       </NavbarItem>
     </>

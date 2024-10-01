@@ -1,9 +1,12 @@
 'use server';
 
+import { INIT_AMOUNT_UNLOCK } from '@/configs/init.configs';
 import { REDIS_KEYS } from '@/configs/redis.configs';
+import { cloneObj } from '@/helpers/object.helpers';
 import { isMongoId } from '@/helpers/string.helpers';
 import prisma from '@/lib/prisma.lib';
 import redis from '@/lib/redis.lib';
+import { $Enums } from '@prisma/client';
 import type { DefaultUser, User } from '@ts//user.types';
 
 const k_userTelegram = (uid: string | number) =>
@@ -139,4 +142,42 @@ export async function initUser(user: DefaultUser): Promise<User | null> {
     console.error(e);
     return null;
   }
+}
+
+export async function createUserTransactions(telegramId: User['telegramId'], body: {
+  amount: number;
+  currencyType: $Enums.CurrencyType;
+  transactionType: $Enums.TransactionType;
+  hash?: string
+}) {
+  return prisma.transaction.create({
+    data: {
+      telegramId,
+      ...body,
+    },
+  });
+}
+
+export async function unlockUser(userId: User['id'] | User['telegramId'] | null, hash?: string): Promise<User | null> {
+  if (!userId) return null;
+  const user = await getUser(userId);
+  if (!user || !user.walletAddress) return null;
+  if (user.isUnlock) return user;
+  const updatedUserData = cloneObj<User>({
+    ...user,
+    isUnlock: true,
+  });
+  if (!updatedUserData) return null;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id, ...userData } = updatedUserData;
+  const userUpdated = await updateUser(userData);
+  if (!userUpdated) return null;
+  createUserTransactions(userUpdated.telegramId, {
+    amount: INIT_AMOUNT_UNLOCK,
+    currencyType: 'COIN',
+    transactionType: 'SPEND',
+    hash,
+  }).then(() => console.info(`User ${userUpdated.username} has unlocked!`));
+  return userUpdated;
 }

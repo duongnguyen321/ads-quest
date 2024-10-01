@@ -1,5 +1,5 @@
 import { SERVER_URI } from '@/configs/site.configs';
-import { parseObj } from '@/helpers/string.helpers';
+import { parseObj } from '@/helpers/object.helpers';
 import type { User } from '@ts//user.types';
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
