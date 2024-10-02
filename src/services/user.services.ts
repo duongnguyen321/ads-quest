@@ -1,16 +1,14 @@
 'use server';
 
-import { REDIS_KEYS } from '@/configs/redis.configs';
+import { k_userAddress, k_userTelegram } from '@/configs/redis.configs';
 import { INIT_AMOUNT_UNLOCK } from '@/configs/ton.configs';
 import { cloneObj } from '@/helpers/object.helpers';
 import { isMongoId } from '@/helpers/string.helpers';
 import prisma from '@/lib/prisma.lib';
 import redis from '@/lib/redis.lib';
+import { removeCache } from '@/services/cached.services';
 import { $Enums } from '@prisma/client';
 import type { DefaultUser, User } from '@ts//user.types';
-
-const k_userTelegram = (uid: string | number) =>
-  `${REDIS_KEYS.user[isMongoId(uid) ? 'id' : 'telegramId']}:${uid}`;
 
 export async function getUser(userId?: string | number) {
   if (!userId) {
@@ -49,25 +47,20 @@ export async function createUser(user: DefaultUser): Promise<User | null> {
 
 export async function updateUser(user: Omit<User, 'id'> | DefaultUser): Promise<User | null> {
   try {
-    const newUser = await prisma.user.update({
+    await removeCache(k_userTelegram(user.telegramId));
+    console.info(`Update user ${user.telegramId} to cache`);
+    return await redis.cached<User | null>(k_userTelegram(user.telegramId), () => prisma.user.update({
       where: {
         telegramId: user.telegramId,
       },
       data: user,
-    });
-    await redis.set(
-      k_userTelegram(user.telegramId),
-      JSON.stringify(newUser),
-    );
-    return newUser as User;
+    }));
   } catch (e) {
     console.error(e);
     return null;
   }
 }
 
-const k_userAddress = (address: string) =>
-  `${REDIS_KEYS.user['address']}:${address}`;
 
 export async function removeAddressUser(userId: User['id'] | User['telegramId'] | null): Promise<User | null> {
   if (!userId) return null;
@@ -75,16 +68,13 @@ export async function removeAddressUser(userId: User['id'] | User['telegramId'] 
     const isMongoUserId = isMongoId(userId);
 
     const whereClause = isMongoUserId ? { id: userId.toString() } : { telegramId: userId.toString() };
+    removeCache(k_userTelegram(userId));
+    await removeCache(k_userAddress(userId));
 
-    const userUpdated = await prisma.user.update({
+    return await redis.cached(k_userTelegram(userId), () => prisma.user.update({
       where: whereClause,
       data: { walletAddress: null },
-    });
-
-    redis.set(k_userAddress(userId), JSON.stringify(userUpdated));
-    redis.set(k_userTelegram(userId), JSON.stringify(userUpdated));
-
-    return userUpdated;
+    }));
   } catch (e) {
     console.error(e);
     return null;
@@ -113,7 +103,7 @@ export async function addAddressUser(userId: User['id'] | User['telegramId'], wa
     data: { walletAddress },
   });
 
-  redis.set(k_userAddress(userId), JSON.stringify(userUpdated));
+  redis.set(k_userAddress(walletAddress), JSON.stringify(userUpdated));
   redis.set(k_userTelegram(userId), JSON.stringify(userUpdated));
 
   return userUpdated;

@@ -7,7 +7,7 @@ import useGlobalContext from '@/hooks/useGlobalContext.hook';
 import useTonAction from '@/hooks/useTonAction';
 import useUserStore from '@/store/user.store';
 import { CardBody, CardFooter, CardHeader } from '@nextui-org/card';
-import { Button, Card } from '@nextui-org/react';
+import { Button, Card, Spacer } from '@nextui-org/react';
 import { ReceiveDollars } from 'iconoir-react/regular';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -55,14 +55,17 @@ function DepositPage() {
       <CardFooter className={'flex-col justify-center items-center'}>
         <ConnectWallet />
         {!user?.isUnlock && (
-          <Button
-            onClick={handleUnlockUser}
-            variant={'shadow'}
-            color={'success'}
-          >
-            <ReceiveDollars />
-            Unlock now
-          </Button>
+          <>
+            <Spacer />
+            <Button
+              onClick={handleUnlockUser}
+              variant={'shadow'}
+              color={'success'}
+            >
+              <ReceiveDollars />
+              Unlock now
+            </Button>
+          </>
         )}
       </CardFooter>
     </Card>

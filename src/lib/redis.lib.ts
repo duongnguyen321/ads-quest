@@ -51,6 +51,7 @@ export class Redis {
 	 * @returns {Promise<number>} A promise that resolves with the number of keys that were deleted.
 	 */
 	async del(key: string): Promise<number> {
+		console.info(`Delete cache in key ${key}`)
 		return this.client.del(key);
 	}
 
@@ -68,8 +69,10 @@ export class Redis {
 	): Promise<T> {
 		const cachedValue = await this.get(key);
 		if (cachedValue) {
+			console.info(`Get from redis because ${key} have in redis.`);
 			return JSON.parse(cachedValue) as T;
 		} else {
+			console.info(`Query database because ${key} dont have in redis.`)
 			const data = await callback();
 			if (data) {
 				const effectiveTTL = ttl

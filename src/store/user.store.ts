@@ -1,5 +1,7 @@
 'use client';
 
+import { k_userTelegram } from '@/configs/redis.configs';
+import { removeCache } from '@/services/cached.services';
 import { getUser } from '@/services/user.services';
 import type { User } from '@ts//user.types';
 import { toast } from 'sonner';
@@ -57,9 +59,10 @@ const useUserStore = create<IStoreUser>((set) => ({
   refetch: async (userId?: User['id'] | User['telegramId']) => {
     if (!userId) return null;
     const toastId = toast.loading('Waiting for refetch user...');
+    await removeCache(k_userTelegram(userId));
     const user = await getUser(userId);
     toast.dismiss(toastId);
-    toast.success('User data has been updated!')
+    toast.success('User data has been updated!');
     set({
       user,
       userId: user?.telegramId || null,
