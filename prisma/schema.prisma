@@ -26,8 +26,9 @@ model User {
   Transaction Transaction[]
 
   // Self-referential relationships for friends
-  Friends  Friend[] @relation("UserFriends")
-  FriendOf Friend[] @relation("FriendUsers")
+  Friends     Friend[]      @relation("UserFriends")
+  FriendOf    Friend[]      @relation("FriendUsers")
+  UserMission UserMission[]
 }
 
 model Level {
@@ -52,15 +53,27 @@ model Friend {
 }
 
 model Mission {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  date        DateTime?    @default(now())
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  date        DateTime?     @default(now())
   amount      Float
   type        CurrencyType
   link        String
   title       String
   description String?
-  createdAt   DateTime?    @default(now()) @map("created_at")
-  updatedAt   DateTime?    @default(now()) @updatedAt @map("updated_at")
+  createdAt   DateTime?     @default(now()) @map("created_at")
+  updatedAt   DateTime?     @default(now()) @updatedAt @map("updated_at")
+  UserMission UserMission[]
+}
+
+model UserMission {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId String    @map("telegram_id")
+  missionId  String    @map("mission_id") @db.ObjectId
+  createdAt  DateTime? @default(now()) @map("created_at")
+  updatedAt  DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  user    User    @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
 }
 
 model Transaction {
