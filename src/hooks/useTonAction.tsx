@@ -65,13 +65,7 @@ export default function useTonAction() {
   }, [handleStatusChange, tonConnectUi]);
 
 
-  async function deposit({
-                           message,
-                           amount,
-                         }: {
-    message: string;
-    amount: number;
-  }) {
+  async function deposit(amount: number, message?: string) {
     if (!wallet) {
       toast.error('Please, Connect Ton Wallet!');
       throw new Error('Please, Connect Ton Wallet!');
@@ -112,7 +106,7 @@ export default function useTonAction() {
       const cell = Cell.fromBoc(bocBuffer)[0];
       const messageHash = cell.hash();
       const base64Hash = Buffer.from(messageHash).toString('base64');
-      await unlockUser(userId, base64Hash);
+      return await unlockUser(userId, base64Hash);
     } catch (error) {
       console.error(error);
       throw error;

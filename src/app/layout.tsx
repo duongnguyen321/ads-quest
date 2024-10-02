@@ -1,7 +1,9 @@
+import Congrats from '@/components/Congrats';
 import AOSInit from '@/components/core/AosInit';
 import Navbar from '@/components/core/Navbar';
 import { fontMono, fontSans } from '@/configs/fonts.configs';
 import { CLIENT_URL, siteConfig } from '@/configs/site.configs';
+import GlobalProvider from '@/context/global.context';
 import { TelegramProvider } from '@/context/telegram.context';
 import { makeDescription, makeTitle } from '@/helpers/string.helpers';
 import { cn } from '@/helpers/tailwind.helpers';
@@ -70,11 +72,14 @@ export default function RootLayout({
       <TelegramProvider>
         <AuthProvider>
           <NextUIProviders attribute="class" defaultTheme="dark">
-            <Navbar />
-            <main>
-              {children}
-            </main>
-            <Toaster richColors />
+            <GlobalProvider>
+              <Navbar />
+              <main>
+                {children}
+              </main>
+              <Toaster richColors />
+              <Congrats />
+            </GlobalProvider>
           </NextUIProviders>
         </AuthProvider>
       </TelegramProvider>

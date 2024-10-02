@@ -1,6 +1,6 @@
 'use client';
 
-import Loading from '@/components/core/Loading';
+import Loading from '@/components/Loading';
 import useInitUser from '@/hooks/useInitUser.hook';
 import { useTelegram } from '@/hooks/useTelegram.hook';
 import useUserStore from '@/store/user.store';
@@ -18,7 +18,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
   }, [fetchUser, setLoading, webApp]);
-  
+
   useLayoutEffect(() => {
     if (
       process.env.NODE_ENV !== 'development' &&

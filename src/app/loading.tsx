@@ -1,6 +1,6 @@
 'use client';
 
-import Loading from '@/components/core/Loading';
+import Loading from '@/components/Loading';
 
 function LoadingPage() {
   return <Loading className={'fixed inset-0'} />;

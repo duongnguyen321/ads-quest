@@ -1,13 +1,12 @@
 'use client';
 
-import { ThemeSwitch } from '@/components/core/SwitchTheme';
+import { ThemeSwitch } from '@/components/SwitchTheme';
 import { requireLevelRevert, requireTONCashout } from '@/configs/require.configs';
 import { format } from '@/helpers/number.helpers';
-import { upperFirstLetter } from '@/helpers/string.helpers';
 import useUserStore from '@/store/user.store';
 import { Button, Navbar as NextUINavbar, NavbarContent, NavbarItem } from '@nextui-org/react';
 import type { User } from '@ts//user.types';
-import { CoinsSwap, MoneySquare, ReceiveDollars } from 'iconoir-react/regular';
+import { CoinsSwap, Home, MoneySquare, ReceiveDollars } from 'iconoir-react/regular';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -32,8 +31,14 @@ export default function Navbar() {
       onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent
         justify="center">
-        <NavbarItem className={'hidden sm:block'} as={'a'} href={`https://t.me/${user?.username}`}>
-          {upperFirstLetter(user?.username)}
+        <NavbarItem>
+          <Button as={Link}
+                  href={'/'}
+                  isIconOnly
+                  variant={'flat'}
+                  color={'primary'}>
+            <Home />
+          </Button>
         </NavbarItem>
 
         <NavbarItem className={'hidden vsm:block'}>
@@ -85,7 +90,7 @@ function NaviLinkUser({ user }: { user: User | null }) {
           href={'/missions'}
           color={'warning'}
           variant={'shadow'}
-          isDisabled={!user || !user.isUnlock}
+          isDisabled={!user || !user.walletAddress || !user.isUnlock}
         >
           <MoneySquare />
           <span>Mission</span>
@@ -97,7 +102,7 @@ function NaviLinkUser({ user }: { user: User | null }) {
           href={'/revert'}
           color={'primary'}
           variant={'shadow'}
-          isDisabled={!user || !user.isUnlock || user?.coinBalance < requireTONCashout || user.level < requireLevelRevert}
+          isDisabled={!user || !user.walletAddress || !user.isUnlock || user?.coinBalance < requireTONCashout || user.level < requireLevelRevert}
         >
           <CoinsSwap />
           <span>Revert</span>

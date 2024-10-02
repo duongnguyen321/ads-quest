@@ -22,12 +22,8 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  Level        Level?         @relation(fields: [level], references: [level])
-  GameSession  GameSession[]
-  Achievement  Achievement[]
-  Transaction  Transaction[]
-  Leaderboard  Leaderboard[]
-  Notification Notification[]
+  Level       Level?        @relation(fields: [level], references: [level])
+  Transaction Transaction[]
 
   // Self-referential relationships for friends
   Friends  Friend[] @relation("UserFriends")
@@ -42,32 +38,27 @@ model Level {
   createdAt        DateTime? @default(now()) @map("created_at")
   updatedAt        DateTime? @default(now()) @updatedAt @map("updated_at")
 
-  User        User[]
-  GameSession GameSession[]
+  User User[]
 }
 
-model GameSession {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  telegramId String   @map("telegram_id")
-  score      Int
-  duration   Int // Duration of the game session in seconds
-  levelId    String?  @db.ObjectId // Track which level the player was on
-  createdAt  DateTime @default(now()) @map("created_at")
+model Friend {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @map("user_id") @db.ObjectId
+  friendId  String   @map("friend_id") @db.ObjectId
+  createdAt DateTime @default(now()) @map("created_at")
 
-  user  User   @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
-  level Level? @relation(fields: [levelId], references: [id])
+  user   User @relation("UserFriends", fields: [userId], references: [id])
+  friend User @relation("FriendUsers", fields: [friendId], references: [id])
 }
 
-model Achievement {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  telegramId  String   @map("telegram_id")
-  title       String
-  description String
-  points      Int      @default(0)
-  isCompleted Boolean  @default(false) // Status of the achievement
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
+model Mission {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime?    @default(now())
+  amount    Float
+  type      CurrencyType
+  link      String
+  createdAt DateTime?    @default(now()) @map("created_at")
+  updatedAt DateTime?    @default(now()) @updatedAt @map("updated_at")
 }
 
 model Transaction {
@@ -90,43 +81,4 @@ enum TransactionType {
 enum CurrencyType {
   COIN
   POINTS
-}
-
-model Leaderboard {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  levelId    String?  @db.ObjectId // The level associated with this leaderboard
-  telegramId String   @map("telegram_id")
-  score      Float
-  createdAt  DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
-}
-
-model GameEvent {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String
-  startDate   DateTime
-  endDate     DateTime
-  createdAt   DateTime @default(now()) @map("created_at")
-}
-
-model Notification {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  telegramId String   @map("telegram_id")
-  message    String
-  isRead     Boolean  @default(false)
-  createdAt  DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
-}
-
-model Friend {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @map("user_id") @db.ObjectId
-  friendId  String   @map("friend_id") @db.ObjectId
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user   User @relation("UserFriends", fields: [userId], references: [id])
-  friend User @relation("FriendUsers", fields: [friendId], references: [id])
 }
