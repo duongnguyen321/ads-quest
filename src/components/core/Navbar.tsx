@@ -6,7 +6,7 @@ import { format } from '@/helpers/number.helpers';
 import useUserStore from '@/store/user.store';
 import { Button, Navbar as NextUINavbar, NavbarContent, NavbarItem } from '@nextui-org/react';
 import type { User } from '@ts//user.types';
-import { CoinsSwap, Home, MoneySquare, ReceiveDollars } from 'iconoir-react/regular';
+import { CoinsSwap, Home, MoneySquare, PlusSquare, ReceiveDollars } from 'iconoir-react/regular';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -23,8 +23,7 @@ export default function Navbar() {
   return (
     <NextUINavbar
       as={`header`}
-      maxWidth="xl"
-      className="print:hidden"
+      className="print:hidden navbar"
       position="sticky"
       shouldHideOnScroll
       isMenuOpen={isMenuOpen}
@@ -49,7 +48,7 @@ export default function Navbar() {
           Point: {format(user?.points)}
         </NavbarItem>
 
-        <NavbarItem className={'hidden sm:block'}>
+        <NavbarItem className={'hidden md:block'}>
           Coin: {format(user?.coinBalance)}
         </NavbarItem>
       </NavbarContent>
@@ -70,7 +69,8 @@ export default function Navbar() {
 function NaviLinkUser({ user }: { user: User | null }) {
   if (!user) return null;
   if (!user?.isUnlock) {
-    return (<NavbarItem>
+    return (
+      <NavbarItem>
       <Button
         as={Link}
         href={'/deposit'}
@@ -80,7 +80,8 @@ function NaviLinkUser({ user }: { user: User | null }) {
         <ReceiveDollars />
         <span>Deposit</span>
       </Button>
-    </NavbarItem>);
+    </NavbarItem>
+    );
   }
   return (
     <>
@@ -91,9 +92,22 @@ function NaviLinkUser({ user }: { user: User | null }) {
           color={'warning'}
           variant={'shadow'}
           isDisabled={!user || !user.walletAddress || !user.isUnlock}
+          className={'px-2 min-w-10'}
         >
           <MoneySquare />
-          <span className={'hidden md:block'}>Mission</span>
+          <span className={'hidden vsm:block'}>Mission</span>
+        </Button>
+      </NavbarItem>
+      <NavbarItem>
+        <Button
+          as={Link}
+          href={'/deposit'}
+          color={'success'}
+          variant={'shadow'}
+          className={'px-2 min-w-10'}
+        >
+          <PlusSquare />
+          <span className={'hidden md:block'}>Add task</span>
         </Button>
       </NavbarItem>
       <NavbarItem>
@@ -103,6 +117,7 @@ function NaviLinkUser({ user }: { user: User | null }) {
           color={'primary'}
           variant={'shadow'}
           isDisabled={!user || !user.walletAddress || !user.isUnlock || user?.coinBalance < requireTONCashout || user.level < requireLevelRevert}
+          className={'px-2 min-w-10'}
         >
           <CoinsSwap />
           <span className={'hidden md:block'}>Revert</span>

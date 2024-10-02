@@ -1,7 +1,8 @@
 'use client';
 
+import AddMission from '@/app/(frontend)/deposit/components/AddMission';
 import ConnectWallet from '@/components/ConnectWallet';
-import { INIT_AMOUNT_UNLOCK } from '@/configs/init.configs';
+import { INIT_AMOUNT_UNLOCK } from '@/configs/ton.configs';
 import useGlobalContext from '@/hooks/useGlobalContext.hook';
 import useTonAction from '@/hooks/useTonAction';
 import useUserStore from '@/store/user.store';
@@ -13,7 +14,7 @@ import { toast } from 'sonner';
 
 function DepositPage() {
   const { deposit } = useTonAction();
-  const {setIsCongrats} = useGlobalContext()
+  const { setIsCongrats } = useGlobalContext();
   const { user, setUserInfo } = useUserStore();
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +27,7 @@ function DepositPage() {
       const userUpdated = await deposit(INIT_AMOUNT_UNLOCK, `Unlock user ${user?.username}`);
       setUserInfo(userUpdated);
       toast.success('User unlock successfully.');
-      setIsCongrats(true)
+      setIsCongrats(true);
       setTimeout(() => setIsCongrats(false), 3000);
     } catch (e) {
       console.error(e);
@@ -45,9 +46,7 @@ function DepositPage() {
       <CardBody className={'!text-teal-800 dark:!text-teal-200 text-center'}>
         {
           user?.isUnlock ? (
-            <span>
-            We&apos;e working on more new features to help you. Thank you, do the quest and get rewarded!
-          </span>
+            <AddMission />
           ) : <>
             <span>You haven&apos;t unlocked your account yet, unlock it!</span>
           </>

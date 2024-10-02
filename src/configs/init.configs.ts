@@ -10,4 +10,3 @@ export const INIT_USER = {
 	isPremium: false,
 }
 
-export const INIT_AMOUNT_UNLOCK = 1

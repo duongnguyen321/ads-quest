@@ -1,7 +1,7 @@
 'use server';
 
-import { INIT_AMOUNT_UNLOCK } from '@/configs/init.configs';
 import { REDIS_KEYS } from '@/configs/redis.configs';
+import { INIT_AMOUNT_UNLOCK } from '@/configs/ton.configs';
 import { cloneObj } from '@/helpers/object.helpers';
 import { isMongoId } from '@/helpers/string.helpers';
 import prisma from '@/lib/prisma.lib';

@@ -84,4 +84,7 @@ export const includeWallets = [
   },
 ];
 
+export const INIT_REWARD_MISSION = +(process.env.AMOUNT_REWARD_MISSION as string) || 1000;
+export const INIT_AMOUNT_MISSION = +(process.env.AMOUNT_ADD_MISSION as string) || 10;
+export const INIT_AMOUNT_UNLOCK = +(process.env.AMOUNT_USER_UNLOCK as string) || 5;
 export const RATE_POINT_TON = 5000;
