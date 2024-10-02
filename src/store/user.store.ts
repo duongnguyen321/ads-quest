@@ -2,6 +2,7 @@
 
 import { getUser } from '@/services/user.services';
 import type { User } from '@ts//user.types';
+import { toast } from 'sonner';
 import { create } from 'zustand';
 
 interface IStoreUser {
@@ -55,7 +56,10 @@ const useUserStore = create<IStoreUser>((set) => ({
   },
   refetch: async (userId?: User['id'] | User['telegramId']) => {
     if (!userId) return null;
+    const toastId = toast.loading('Waiting for refetch user...');
     const user = await getUser(userId);
+    toast.dismiss(toastId);
+    toast.success('User data has been updated!')
     set({
       user,
       userId: user?.telegramId || null,

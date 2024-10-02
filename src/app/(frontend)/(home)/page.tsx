@@ -9,7 +9,6 @@ import { Button, Card } from '@nextui-org/react';
 import { MoneySquare, ReceiveDollars } from 'iconoir-react/regular';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
 
 export default function Home() {
   const { user: userTelegram } = useTelegram();
@@ -31,12 +30,9 @@ export default function Home() {
 
   const handleRefetch = useCallback(() => {
     if (!canRefetch) return;
-    lastRefetch.current = Date.now();
-    setCanRefetch(false); // Disable refetching until the time has elapsed
-    const id = toast.loading('Refetching...');
     refetch(user?.telegramId).then(() => {
-      toast.dismiss(id);
-      toast.success('Refetch successfully.');
+      lastRefetch.current = Date.now();
+      setCanRefetch(false);
     });
   }, [canRefetch, refetch, user?.telegramId]);
 

@@ -41,15 +41,15 @@ export default function Navbar() {
           </Button>
         </NavbarItem>
 
-        <NavbarItem className={'hidden vsm:block'}>
+        <NavbarItem className={'hidden md:block'}>
           Level: {user?.level || 1}
         </NavbarItem>
 
-        <NavbarItem>
+        <NavbarItem className={'hidden sm:block'}>
           Point: {format(user?.points)}
         </NavbarItem>
 
-        <NavbarItem>
+        <NavbarItem className={'hidden sm:block'}>
           Coin: {format(user?.coinBalance)}
         </NavbarItem>
       </NavbarContent>
@@ -93,7 +93,7 @@ function NaviLinkUser({ user }: { user: User | null }) {
           isDisabled={!user || !user.walletAddress || !user.isUnlock}
         >
           <MoneySquare />
-          <span>Mission</span>
+          <span className={'hidden md:block'}>Mission</span>
         </Button>
       </NavbarItem>
       <NavbarItem>
@@ -105,7 +105,7 @@ function NaviLinkUser({ user }: { user: User | null }) {
           isDisabled={!user || !user.walletAddress || !user.isUnlock || user?.coinBalance < requireTONCashout || user.level < requireLevelRevert}
         >
           <CoinsSwap />
-          <span>Revert</span>
+          <span className={'hidden md:block'}>Revert</span>
         </Button>
       </NavbarItem>
     </>
