@@ -13,8 +13,8 @@ model User {
   username      String  @unique
   telegramId    String  @unique @map("telegram_id")
   isPremium     Boolean @default(false) @map("is_premium")
-  points        Float   @default(0) // In-game points
-  coinBalance   Float   @default(0) // COIN currency (virtual game coin)
+  points        Float   @default(0)
+  coinBalance   Float   @default(0)
   walletAddress String? @map("wallet_address")
   level         Int     @default(1) @map("user_level")
   isUnlock      Boolean @default(false) @map("unlock")
@@ -25,31 +25,46 @@ model User {
   Level       Level?        @relation(fields: [level], references: [level])
   Transaction Transaction[]
 
-  // Self-referential relationships for friends
   Friends     Friend[]      @relation("UserFriends")
   FriendOf    Friend[]      @relation("FriendUsers")
   UserMission UserMission[]
+
+  Mission Mission[] @relation("UserFriends")
+
+  // Indexes for search and sorting
+  @@index([level])
+  @@index([isPremium])
+  @@index([createdAt])
+  @@index([updatedAt])
 }
 
 model Level {
   id               String    @id @default(auto()) @map("_id") @db.ObjectId
   level            Int       @unique @default(1)
-  description      String? // Description of the level
-  experienceNeeded Int?      @default(0) // Points needed to reach this level
+  description      String?
+  experienceNeeded Int?      @default(0)
   createdAt        DateTime? @default(now()) @map("created_at")
   updatedAt        DateTime? @default(now()) @updatedAt @map("updated_at")
 
   User User[]
+
+  // Index for search and sorting
+  @@index([createdAt])
+  @@index([updatedAt])
 }
 
 model Friend {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @map("user_id") @db.ObjectId
-  friendId  String   @map("friend_id") @db.ObjectId
+  userId    String   @map("user_id")
+  friendId  String   @map("friend_id")
   createdAt DateTime @default(now()) @map("created_at")
 
-  user   User @relation("UserFriends", fields: [userId], references: [id])
-  friend User @relation("FriendUsers", fields: [friendId], references: [id])
+  user   User @relation("UserFriends", fields: [userId], references: [telegramId])
+  friend User @relation("FriendUsers", fields: [friendId], references: [telegramId])
+
+  // Index for faster querying of user-friend relationships
+  @@index([userId, friendId])
+  @@index([createdAt])
 }
 
 model Mission {
@@ -60,9 +75,18 @@ model Mission {
   link        String
   title       String
   description String?
+  createBy    String
   createdAt   DateTime?     @default(now()) @map("created_at")
-  updatedAt   DateTime?     @default(now()) @updatedAt @map("updated_at")
+  updatedAt   DateTime?     @updatedAt @map("updated_at")
+  user        User          @relation("UserFriends", fields: [createBy], references: [telegramId])
   UserMission UserMission[]
+
+  // Indexes for search and sorting
+  @@index([date])
+  @@index([amount])
+  @@index([createBy])
+  @@index([createdAt])
+  @@index([updatedAt])
 }
 
 model UserMission {
@@ -70,21 +94,32 @@ model UserMission {
   telegramId String    @map("telegram_id")
   missionId  String    @map("mission_id") @db.ObjectId
   createdAt  DateTime? @default(now()) @map("created_at")
-  updatedAt  DateTime? @default(now()) @updatedAt @map("updated_at")
+  updatedAt  DateTime? @updatedAt @map("updated_at")
 
   user    User    @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
   mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  // Index for fast lookup by telegramId and missionId
+  @@index([telegramId])
+  @@index([missionId])
+  @@index([createdAt])
+  @@index([updatedAt])
 }
 
 model Transaction {
   id              String          @id @default(auto()) @map("_id") @db.ObjectId
   telegramId      String          @map("telegram_id")
-  amount          Float // Amount of COIN or game points
-  currencyType    CurrencyType // Enum to track type of currency (COIN or POINTS)
-  transactionType TransactionType // Enum for types of transactions (earn, spend, bonus)
+  amount          Float
+  currencyType    CurrencyType
+  transactionType TransactionType
   hash            String?
   createdAt       DateTime        @default(now()) @map("created_at")
   user            User            @relation(fields: [telegramId], references: [telegramId], onDelete: Cascade)
+
+  // Indexes for transaction-related queries
+  @@index([telegramId])
+  @@index([amount])
+  @@index([createdAt])
 }
 
 enum TransactionType {

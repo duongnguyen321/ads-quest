@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf node_modules",
-    "postinstall": "npx prisma generate",
+    "postinstall": "npx prisma generate && node ./scripts/setup-git-hooks.js",
     "prebuild": "npx prisma generate",
     "build": "NODE_ENV=production && next build",
     "start": "NODE_ENV=production && next start",
